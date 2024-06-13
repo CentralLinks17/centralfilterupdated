@@ -5,8 +5,8 @@
 
 class script(object):
     START_TXT = """<b> Hello... {} 👋
+    
 ✯ My name is <a href=https://telegram.dog/{}>{}</a>
-
 ✯ I am the latest and most advanced auto filter bot.
 ✯ I Can Provide MOVIES,SERIES And Lot More
 ✯ Don't waste your time looking to add me to your group; I'm only for @CentralRequest.
