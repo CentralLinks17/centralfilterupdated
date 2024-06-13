@@ -53,7 +53,12 @@ class Database:
         'is_shortlink': IS_SHORTLINK,
         'fsub': None,
         'tutorial': TUTORIAL,
-        'is_tutorial': IS_TUTORIAL
+        'is_tutorial': IS_TUTORIAL,
+        'vj': None,
+        'techvj': None,
+        'tech_vj': None,
+        'vjtech': None,
+        'vj_tech': None
     }
     
     def __init__(self, uri, database_name):
