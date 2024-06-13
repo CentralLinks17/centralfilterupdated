@@ -1,7 +1,3 @@
-# Don't Remove Credit @VJ_Botz
-# Subscribe YouTube Channel For Amazing Bot @Tech_VJ
-# Ask Doubt on telegram @KingVJ01
-
 import pymongo
 
 from info import DATABASE_URI, DATABASE_NAME
@@ -134,4 +130,3 @@ async def delete_connection(user_id, group_id):
     except Exception as e:
         logger.exception(f'Some error occurred! {e}', exc_info=True)
         return False
-
