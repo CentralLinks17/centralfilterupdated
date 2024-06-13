@@ -55,13 +55,13 @@ PREMIUM_AND_REFERAL_MODE = bool(environ.get('PREMIUM_AND_REFERAL_MODE', True)) #
 
 # If PREMIUM_AND_REFERAL_MODE is True Then Fill Below Variable, If Flase Then No Need To Fill.
 REFERAL_COUNT = int(environ.get('REFERAL_COUNT', '20')) # number of referal count
-REFERAL_PREMEIUM_TIME = environ.get('REFERAL_PREMEIUM_TIME', '1month')
+REFERAL_PREMEIUM_TIME = environ.get('REFERAL_PREMEIUM_TIME', '7days')
 PAYMENT_QR = environ.get('PAYMENT_QR', 'https://telegra.ph/file/470ec1cda7484d003ad70.jpg')
-PAYMENT_TEXT = environ.get('PAYMENT_TEXT', '<b>-Avaiable Plans-\n\n• 30Rs - 1 Week\n• 60Rs - 1 Month\n• 150Rs - 3 Months\n• 250Rs - 6 Months\n• 500Rs - 1 Year\n\n🎁 Premium Features 🎁\n\n• No need to verify. \n• No need to open link. \n• Direct files.\n• Ad-Free Experience. \n• High Speed Download link.\n• Multi-Player Streaming Link. \n• Unlimited Movies/Series. \n• Full Admin Support. \n• Request will be completed in 1 hour if available on OTT or any network source. \n\n✨ UPI ID: <code>thiyaku1703-1@okhdfcbank</code> Click here to check your active plan /myplan. Must send screenshot after payment to our chat bot, @CentralLinks_Contactbot\n\n‼️ After sending the screenshot, kindly wait until the admin verifies and adds you to the premium plan.</b>')
+PAYMENT_TEXT = environ.get('PAYMENT_TEXT', '<b>-Avaiable Plans-\n\n• 30Rs - 1 Week\n• 60Rs - 1 Month\n• 150Rs - 3 Months\n• 250Rs - 6 Months\n• 500Rs - 1 Year\n\n🎁 Premium Features 🎁\n\n• No need to verify. \n• No need to open link. \n• Direct files.\n• Ad-Free Experience. \n• High Speed Download link.\n• Multi-Player Streaming Link. \n• Unlimited Movies/Series. \n• Full Admin Support. \n• Request will be completed in 1 hour if available on OTT or any network source. \n\n✨ UPI ID: <code>thiyaku1703-1@okhdfcbank</code> \n\nClick here to check your active plan /myplan. \nMust send screenshot after payment to our chat bot, @CentralLinks_Contactbot\n\n‼️ After sending the screenshot, kindly wait until the admin verifies and adds you to the premium plan.</b>')
 OWNER_USERNAME = environ.get('OWNER_USERNAME', 'Thiyaku_Suriya') # owner username without @
 
 # Links
-GRP_LNK = environ.get('GRP_LNK', 'https://t.me/+wQYqSPnDBoZjYmY9')
+GRP_LNK = environ.get('GRP_LNK', '')
 CHNL_LNK = environ.get('CHNL_LNK', 'https://t.me/central_links')
 TUTORIAL = environ.get('TUTORIAL', 'https://t.me/central_tutorial/21')
 SUPPORT_CHAT = environ.get('SUPPORT_CHAT', 'centralrequest') # Support Chat Link Without https:// or @
