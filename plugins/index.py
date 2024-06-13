@@ -1,7 +1,3 @@
-# Don't Remove Credit @VJ_Botz
-# Subscribe YouTube Channel For Amazing Bot @Tech_VJ
-# Ask Doubt on telegram @KingVJ01
-
 import logging, re, asyncio
 from utils import temp
 from info import ADMINS
@@ -80,7 +76,7 @@ async def send_for_index(bot, message):
     try:
         k = await bot.get_messages(chat_id, last_msg_id)
     except:
-        return await message.reply('Make Sure That Iam An Admin In The Channel, if channel is private')
+        return await message.reply("Make Sure That I'm An Admin In The Channel, if channel is private")
     if k.empty:
         return await message.reply('This may be group and iam not a admin of the group.')
 
