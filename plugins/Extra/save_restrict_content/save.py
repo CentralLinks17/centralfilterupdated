@@ -33,9 +33,9 @@ async def start_save(client: Client, message: Message):
     update = message.from_user.id
     save = await db.get_save(update)
     if save == True:
-        return await message.reply("**ʏᴏᴜ'ᴠᴇ ᴀʟʀᴇᴀᴅʏ sᴛᴀʀᴛᴇᴅ ᴏɴᴇ ʙᴀᴛᴄʜ, ᴡᴀɪᴛ ғᴏʀ ɪᴛ ᴛᴏ ᴄᴏᴍᴘʟᴇᴛᴇ ʏᴏᴜ ᴅᴜᴍʙғᴜᴄᴋ ᴏᴡɴᴇʀ ❗**\n\n**Cancel Ongoing Task By - /cancel_save**")
+        return await message.reply("**You've already started one batch; wait for it to complete, dumb fuck owner! **\n\n** Cancel Ongoing Task By: - /cancel_save**")
     await db.set_save(update, save=True)
-    await client.send_message(update, "**sᴇɴᴅ ᴍᴇ ᴛʜᴇ ᴍᴇssᴀɢᴇ ʟɪɴᴋ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ sᴛᴀʀᴛ sᴀᴠɪɴɢ ғʀᴏᴍ**")
+    await client.send_message(update, "**Send me the message link you want to start saving from.**")
     
     
 async def run_save(client, sender, link, _range):
@@ -55,27 +55,27 @@ async def run_save(client, sender, link, _range):
         try: 
             save = await db.get_save(sender)
             if save == False:
-                await client.send_message(sender, "**ʙᴀᴛᴄʜ ᴄᴏᴍᴘʟᴇᴛᴇᴅ.**")
+                await client.send_message(sender, "**Batch Completed**")
                 break
         except Exception as e:
             print(e)
-            await client.send_message(sender, "**ʙᴀᴛᴄʜ ᴄᴏᴍᴘʟᴇᴛᴇᴅ.**")
+            await client.send_message(sender, "**Batch Completed**")
             break
         try:
             await get_bulk_msg(client, sender, link, i) 
         except FloodWait as fw:
             if int(fw.x) > 299:
-                await client.send_message(sender, "**ᴄᴀɴᴄᴇʟʟɪɴɢ ʙᴀᴛᴄʜ sɪɴᴄᴇ ʏᴏᴜ ʜᴀᴠᴇ ғʟᴏᴏᴅᴡᴀɪᴛ ᴍᴏʀᴇ ᴛʜᴀɴ 5 ᴍɪɴᴜᴛᴇs.**")
+                await client.send_message(sender, "**Canceling the batch since you have flood-wait and you need to wait more than 5 minutes.**")
                 break
             await asyncio.sleep(fw.x + 5)
             await get_bulk_msg(client, sender, link, i)
-        protection = await client.send_message(sender, f"**sʟᴇᴇᴘɪɴɢ ғᴏʀ** `{timer}` **sᴇᴄᴏɴᴅs ᴛᴏ ᴀᴠᴏɪᴅ ғʟᴏᴏᴅᴡᴀɪᴛs ᴀɴᴅ ᴘʀᴏᴛᴇᴄᴛ ᴀᴄᴄᴏᴜɴᴛ**")
+        protection = await client.send_message(sender, f"**Sleeping for** `{timer}` **seconds to avoid floodwait and protect account.**")
         await asyncio.sleep(timer)
         await protection.delete()
-    await client.send_message(sender, "**ʙᴀᴛᴄʜ ᴄᴏᴍᴘʟᴇᴛᴇᴅ.**")
+    await client.send_message(sender, "**Batch Completed**")
 
 async def get_bulk_msg(client, sender, msg_link, i):
-    x = await client.send_message(sender, text="**ᴘʀᴏᴄᴇssɪɴɢ ❗**")
+    x = await client.send_message(sender, text="**Processing ❗**")
     await get_msg(client, sender, x.id, msg_link, i)
 
 async def get_msg(client, sender, edit_id, msg_link, i):
@@ -98,33 +98,33 @@ async def get_msg(client, sender, edit_id, msg_link, i):
             msg = await tech_vj_userbot.get_messages(chat, msg_id)
             if not msg.media:
                 if msg.text:
-                    edit = await client.edit_message_text(sender, edit_id, "**ᴄʟᴏɴɪɴɢ.**")
+                    edit = await client.edit_message_text(sender, edit_id, "**Cloning...**")
                     await client.send_message(sender, msg.text.markdown)
                     await edit.delete()
                     return
-            edit = await client.edit_message_text(sender, edit_id, "**ᴛʀʏɪɴɢ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ.**")
+            edit = await client.edit_message_text(sender, edit_id, "**Trying to download...**")
             if msg.media==MessageMediaType.VIDEO:
                 if msg.video.file_size > MAX:
-                    return await client.edit_message_text(sender, edit_id, f"**ғᴀɪʟᴇᴅ ᴛᴏ sᴀᴠᴇ:** `{msg_link}`\n\n**ᴇʀʀᴏʀ: Can't Upload File Bigger Than 2 GB**")
+                    return await client.edit_message_text(sender, edit_id, f"**Failed to save:** `{msg_link}`\n\n**Error: Can't upload file bigger than 2GB**")
             if msg.media==MessageMediaType.VIDEO_NOTE:
                 if msg.video_note.file_size > MAX:
-                    return await client.edit_message_text(sender, edit_id, f"**ғᴀɪʟᴇᴅ ᴛᴏ sᴀᴠᴇ:** `{msg_link}`\n\n**ᴇʀʀᴏʀ: Can't Upload File Bigger Than 2 GB**")
+                    return await client.edit_message_text(sender, edit_id, f"**Failed to save:** `{msg_link}`\n\n**Error: Can't upload file bigger than 2GB**")
             if msg.media==MessageMediaType.DOCUMENT:
                 if msg.document.file_size > MAX:
-                    return await client.edit_message_text(sender, edit_id, f"**ғᴀɪʟᴇᴅ ᴛᴏ sᴀᴠᴇ:** `{msg_link}`\n\n**ᴇʀʀᴏʀ: Can't Upload File Bigger Than 2 GB**")
+                    return await client.edit_message_text(sender, edit_id, f"**Failed to save:** `{msg_link}`\n\n**Error: Can't upload file bigger than 2GB**")
            
             file = await tech_vj_userbot.download_media(
                 msg,
                 progress=progress_for_pyrogram,
                 progress_args=(
                     client,
-                    "🖥️ **ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ:**\n",
+                    "🖥️ **Downloading:**\n",
                     edit,
                     time.time()
                 )
             )
             print(file)
-            await edit.edit('**ᴘʀᴇᴘᴀʀɪɴɢ ᴛᴏ ᴜᴘʟᴏᴀᴅ ❗**')
+            await edit.edit('**Preparing to upload... ❗**')
             caption=None
             if msg.caption is not None:
                 caption = msg.caption
@@ -144,7 +144,7 @@ async def get_msg(client, sender, edit_id, msg_link, i):
                     progress=progress_for_pyrogram,
                     progress_args=(
                         client,
-                        '**ᴜᴘʟᴏᴀᴅɪɴɢ:**\n',
+                        '**Uploading:**\n',
                         edit,
                         time.time()
                     )
@@ -188,7 +188,7 @@ async def get_msg(client, sender, edit_id, msg_link, i):
                     progress=progress_for_pyrogram,
                     progress_args=(
                         client,
-                        '**ᴜᴘʟᴏᴀᴅɪɴɢ:**\n',
+                        '**Uploading:**\n',
                         edit,
                         time.time()
                     )
@@ -216,7 +216,7 @@ async def get_msg(client, sender, edit_id, msg_link, i):
             await client.edit_message_text(sender, edit_id, "**My Owner Account Don't Join Your Channel.\n\nSend /join then send your channel invite link then try again**")
             return 
     else:
-        edit = await client.edit_message_text(sender, edit_id, "**ᴄʟᴏɴɪɴɢ.**")
+        edit = await client.edit_message_text(sender, edit_id, "**Cloning...**")
         chat =  msg_link.split("t.me")[1].split("/")[1]
         try:
             msg = await client.get_messages(chat, msg_id)
@@ -227,7 +227,7 @@ async def get_msg(client, sender, edit_id, msg_link, i):
             await client.copy_message(sender, chat, msg_id)
         except Exception as e:
             print(e)
-            return await client.edit_message_text(sender, edit_id, f'**ғᴀɪʟᴇᴅ ᴛᴏ sᴀᴠᴇ:** `{msg_link}`\n\n**ᴇʀʀᴏʀ**: {str(e)}')
+            return await client.edit_message_text(sender, edit_id, f'**Failed to save:** `{msg_link}`\n\n**ᴇʀʀᴏʀ**: {str(e)}')
         await edit.delete() 
 
 async def progress_for_pyrogram(
@@ -261,7 +261,7 @@ async def progress_for_pyrogram(
             ''.join([UN_FINISHED_PROGRESS_STR for i in range(10 - math.floor(percentage / 10))]),
             round(percentage, 2))
 
-        tmp = progress + "⏳ **ɢʀᴏss:** **{0}** **ᴏғ** **{1}**\n\n🚀 **sᴘᴇᴇᴅ:** **{2}**/**s**\n\n🕛 **ᴇᴛᴀ:** **{3}**\n\n**Powered By : @VJ_Botz**".format(
+        tmp = progress + "⏳ **Gross:** **{0}** **ᴏғ** **{1}**\n\n🚀 **Speed:** **{2}**/**s**\n\n🕛 **ETA:** **{3}**\n\n**Powered By : @Central_Links**".format(
             humanbytes(current),
             humanbytes(total),
             humanbytes(speed),
