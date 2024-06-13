@@ -7,16 +7,8 @@ from info import *
 from imdb import Cinemagoer 
 from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram import enums
-import asyncio
 from pyrogram.errors import *
 from typing import Union
-import pytz
-import random 
-import re
-import os
-import string
-import requests
-import aiohttp
 from Script import script
 from datetime import datetime, date
 from typing import List
