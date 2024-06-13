@@ -21,20 +21,20 @@ async def start(client, message):
     await message.react(emoji="🔥")
     if message.chat.type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
         buttons = [[
-                InlineKeyboardButton('🔍 Search Movies/Series', switch_inline_query_current_chat='')
+            InlineKeyboardButton('🔍 Search Movies/Series', switch_inline_query_current_chat='')
         ],[
-                InlineKeyboardButton('Earn Money 💸', callback_data="shortlink_info"),
-                InlineKeyboardButton('⌬ Movies Channel', url='https://telegram.me/central_links')
+            InlineKeyboardButton('Earn Money 💸', callback_data="shortlink_info"),
+            InlineKeyboardButton('⌬ Movies Channel', url='https://telegram.me/central_links')
         ],[
-                InlineKeyboardButton('Support 💁', url='https://telegram.me/CentralLinks_Contactbot'),
-                InlineKeyboardButton('Request Invite 💁', url='https://telegram.me/CentralRequest')
+            InlineKeyboardButton('Support 💁', url='https://telegram.me/CentralLinks_Contactbot'),
+            InlineKeyboardButton('Request Invite 💁', url='https://telegram.me/CentralRequest')
         ],[
-                InlineKeyboardButton('🔻 Get Free/Paid subscription 🔻', callback_data='subscription')
+            InlineKeyboardButton('🔻 Get Free/Paid subscription 🔻', callback_data='subscription')
         ],[
-                InlineKeyboardButton('〄 Help', callback_data='help'),
-                InlineKeyboardButton('⍟ About', callback_data='about')
+            InlineKeyboardButton('〄 Help', callback_data='help'),
+            InlineKeyboardButton('⍟ About', callback_data='about')
         ],[
-                InlineKeyboardButton('✇ Jᴏɪɴ Uᴘᴅᴀᴛᴇs Cʜᴀɴɴᴇʟ ✇', url='https://telegram.me/central_links')
+            InlineKeyboardButton('✇ Jᴏɪɴ Uᴘᴅᴀᴛᴇs Cʜᴀɴɴᴇʟ ✇', url='https://telegram.me/central_links')
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
         await message.reply(script.START_TXT.format(message.from_user.mention if message.from_user else message.chat.title, temp.U_NAME, temp.B_NAME), reply_markup=reply_markup, disable_web_page_preview=True)
