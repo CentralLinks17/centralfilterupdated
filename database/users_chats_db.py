@@ -66,17 +66,12 @@ class Database:
         self.db = self._client[database_name]
         self.col = self.db.users
         self.grp = self.db.groups
-        self.users = self.db.uersz
 
 
     def new_user(self, id, name):
         return dict(
             id = id,
             name = name,
-            file_id=None,
-            caption=None,
-            message_command=None,
-            save=False,
             ban_status=dict(
                 is_banned=False,
                 ban_reason="",
@@ -92,7 +87,7 @@ class Database:
                 is_disabled=False,
                 reason="",
             ),
-            settings=self.default_setgs
+            #settings=self.default_setgs
         )
     
     async def add_user(self, id, name):
@@ -170,10 +165,27 @@ class Database:
         
     
     async def get_settings(self, id):
+        default = {
+            'button': SINGLE_BUTTON,
+            'botpm': P_TTI_SHOW_OFF,
+            'file_secure': PROTECT_CONTENT,
+            'imdb': IMDB,
+            'spell_check': SPELL_CHECK_REPLY,
+            'welcome': MELCOW_NEW_USERS,
+            'auto_delete': AUTO_DELETE,
+            'auto_ffilter': AUTO_FFILTER,
+            'max_btn': MAX_BTN,
+            'template': IMDB_TEMPLATE,
+            'shortlink': SHORTLINK_URL,
+            'shortlink_api': SHORTLINK_API,
+            'is_shortlink': IS_SHORTLINK,
+            'tutorial': TUTORIAL,
+            'is_tutorial': IS_TUTORIAL
+        }
         chat = await self.grp.find_one({'id':int(id)})
         if chat:
-            return chat.get('settings', self.default_setgs)
-        return self.default_setgs
+            return chat.get('settings', default)
+        return default
     
 
     async def disable_chat(self, chat, reason="No Reason"):
