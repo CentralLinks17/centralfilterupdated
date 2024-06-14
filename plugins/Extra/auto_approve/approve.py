@@ -55,13 +55,13 @@ async def auto_approve(client, message: ChatJoinRequest):
                         InlineKeyboardButton('Earn Money 💸', callback_data="shortlink_info"),
                         InlineKeyboardButton('⌬ Main Channel', url='https://t.me/central_links')
                     ],[
-                        InlineKeyboardButton('〄 Help', callback_data='help'),
-                        InlineKeyboardButton('⍟ About', callback_data='about')
+                        InlineKeyboardButton('Support Chat 💁', url='https://t.me/CentralLinks_Contactbot'),
+                        InlineKeyboardButton('Request Invite 💁', url='https://t.me/CentralRequest')
                     ],[
                         InlineKeyboardButton('🔻 Get Free/Paid Subscription 🔻', callback_data='subscription')
                     ],[
-                        InlineKeyboardButton('Support 💁', url='https://t.me/CentralLinks_Contactbot'),
-                        InlineKeyboardButton('About ME 📬', callback_data='about')
+                        InlineKeyboardButton('〄 Help', callback_data='help'),
+                        InlineKeyboardButton('⍟ About', callback_data='about')
                     ],[
                         InlineKeyboardButton('✇ Updates Channel ✇', url='https://t.me/central_links')
                     ]]
@@ -72,13 +72,13 @@ async def auto_approve(client, message: ChatJoinRequest):
                         InlineKeyboardButton('Earn Money 💸', callback_data="shortlink_info"),
                         InlineKeyboardButton('⌬ Main Channel', url='https://t.me/central_links')
                     ],[
-                        InlineKeyboardButton('〄 Help', callback_data='help'),
-                        InlineKeyboardButton('⍟ About', callback_data='about')
+                        InlineKeyboardButton('Support Chat 💁', url='https://t.me/CentralLinks_Contactbot'),
+                        InlineKeyboardButton('Request Invite 💁', url='https://t.me/CentralRequest')
                     ],[
                         InlineKeyboardButton('🔻 Get Free/Paid Subscription 🔻', callback_data='subscription')
                     ],[
-                        InlineKeyboardButton('Support 💁', url='https://t.me/CentralLinks_Contactbot'),
-                        InlineKeyboardButton('About ME 📬', callback_data='about')
+                        InlineKeyboardButton('〄 Help', callback_data='help'),
+                        InlineKeyboardButton('⍟ About', callback_data='about')
                     ],[
                         InlineKeyboardButton('✇ Updates Channel ✇', url='https://t.me/central_links')
                     ]]
