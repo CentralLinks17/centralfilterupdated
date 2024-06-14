@@ -11,7 +11,7 @@ from pyrogram.errors.exceptions.bad_request_400 import MessageTooLong, PeerIdInv
 from utils import get_settings, pub_is_subscribed, get_size, is_subscribed, save_group_settings, temp, verify_user, check_token, check_verification, get_token, get_shortlink, get_tutorial, get_seconds
 from database.connections_mdb import active_connection
 
-BOT_START_TIME = time.time()
+# BOT_START_TIME = time.time()
 
 @Client.on_message(filters.new_chat_members & filters.group)
 async def save_group(bot, message):
@@ -58,8 +58,7 @@ async def save_group(bot, message):
                         await (temp.MELCOW['welcome']).delete()
                     except:
                         pass
-                temp.MELCOW['welcome'] = await message.reply_video(
-                video="https://telegra.ph/file/03691465baa774e46506d.mp4",                                               
+                temp.MELCOW['welcome'] = await message.reply_video(video="https://telegra.ph/file/03691465baa774e46506d.mp4",                                               
                                                  caption=f'<b>Hey, {u.mention} 👋🏻\nWelcome to our group {message.chat.title}\n\nYou can find Movies / Series / Anime from here. Enjoyyy😉.\n\n<b>┏≫ Follow Group Rules</b>\n┣ <b>Main Channel›› @Central_links</b></code>\n<b>┗≫ Follow Group Rules</b>',
                                                  reply_markup=InlineKeyboardMarkup(
                                                                          [[
@@ -165,38 +164,38 @@ async def get_ststs(bot, message):
     free_dbSize = 512-used_dbSize
     await rju.edit(script.STATUS_TXT.format(files, total_users, totl_chats, round(used_dbSize, 2), round(free_dbSize, 2)))
 
-'''@Client.on_callback_query()
-async def cb_handler(client: Client, query: CallbackQuery):
-    if query.data == "close_data":
-        await query.message.delete()
-    elif query.data == "refrsh":
-        await query.answer("Fetching MongoDb DataBase")
-        buttons = [[
-            InlineKeyboardButton('Cʟᴏsᴇ ✘', callback_data='close_data'),
-            InlineKeyboardButton('⟲ Rᴇғʀᴇsʜ', callback_data='refrsh')
-        ]]
-        await client.edit_message_media(
-            query.message.chat.id, 
-            query.message.id, 
-            InputMediaPhoto(random.choice(PICS))
-        )
-        reply_markup = InlineKeyboardMarkup(buttons)
-        total = await Media.count_documents()
-        users = await db.total_users_count()
-        chats = await db.total_chat_count()
-        monsize = await db.get_db_size()
-        free = 536870912 - monsize
-        monsize = get_size(monsize)
-        free = get_size(free)
-        cpu_usage = psutil.cpu_percent()
-        ram_usage = psutil.virtual_memory().percent
-        disk_usage = psutil.disk_usage('/').percent
-        currentTime = time.strftime("%Hh%Mm%Ss", time.gmtime(time.time() - BOT_START_TIME))
-        await query.message.edit_text(
-            text=script.STATUS_TXT.format(total, users, chats, monsize, free, cpu_usage, ram_usage, disk_usage, currentTime),
-            reply_markup=reply_markup,
-            parse_mode=enums.ParseMode.HTML
-        )'''
+# '''@Client.on_callback_query()
+# async def cb_handler(client: Client, query: CallbackQuery):
+#     if query.data == "close_data":
+#         await query.message.delete()
+#     elif query.data == "refrsh":
+#         await query.answer("Fetching MongoDb DataBase")
+#         buttons = [[
+#             InlineKeyboardButton('Cʟᴏsᴇ ✘', callback_data='close_data'),
+#             InlineKeyboardButton('⟲ Rᴇғʀᴇsʜ', callback_data='refrsh')
+#         ]]
+#         await client.edit_message_media(
+#             query.message.chat.id, 
+#             query.message.id, 
+#             InputMediaPhoto(random.choice(PICS))
+#         )
+#         reply_markup = InlineKeyboardMarkup(buttons)
+#         total = await Media.count_documents()
+#         users = await db.total_users_count()
+#         chats = await db.total_chat_count()
+#         monsize = await db.get_db_size()
+#         free = 536870912 - monsize
+#         monsize = get_size(monsize)
+#         free = get_size(free)
+#         cpu_usage = psutil.cpu_percent()
+#         ram_usage = psutil.virtual_memory().percent
+#         disk_usage = psutil.disk_usage('/').percent
+#         currentTime = time.strftime("%Hh%Mm%Ss", time.gmtime(time.time() - BOT_START_TIME))
+#         await query.message.edit_text(
+#             text=script.STATUS_TXT.format(total, users, chats, monsize, free, cpu_usage, ram_usage, disk_usage, currentTime),
+#             reply_markup=reply_markup,
+#             parse_mode=enums.ParseMode.HTML
+#         )'''
 @Client.on_message(filters.command('invite') & filters.user(ADMINS))
 async def gen_invite(bot, message):
     if len(message.command) == 1:
