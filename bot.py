@@ -2,13 +2,7 @@
 # Subscribe YouTube Channel For Amazing Bot @Tech_VJ
 # Ask Doubt on telegram @KingVJ01
 
-import sys
-import glob
-import importlib
-import logging
-import logging.config
-import pytz
-import asyncio
+import sys, glob, importlib, logging, logging.config, pytz, asyncio
 from pathlib import Path
 
 # Get logging configurations
@@ -23,15 +17,15 @@ logging.basicConfig(
 logging.getLogger("aiohttp").setLevel(logging.ERROR)
 logging.getLogger("aiohttp.web").setLevel(logging.ERROR)
 
-from pyrogram import Client, idle
+from pyrogram import Client, idle 
 from pyromod import listen
 from database.ia_filterdb import Media
 from database.users_chats_db import db
 from info import *
 from utils import temp
 from typing import Union, Optional, AsyncGenerator
-from Script import script
-from datetime import date, datetime
+from Script import script 
+from datetime import date, datetime 
 from aiohttp import web
 from plugins import web_server
 
@@ -42,10 +36,12 @@ from TechVJ.bot.clients import initialize_clients
 ppath = "plugins/*.py"
 files = glob.glob(ppath)
 TechVJBot.start()
+loop = asyncio.get_event_loop()
+
 
 async def start():
     print('\n')
-    print('Initializing Your Bot')
+    print('Initalizing Your Bot')
     bot_info = await TechVJBot.get_me()
     await initialize_clients()
     for name in files:
@@ -58,7 +54,7 @@ async def start():
             load = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(load)
             sys.modules["plugins." + plugin_name] = load
-            print("Tech CL Imported => " + plugin_name)
+            print("Tech VJ Imported => " + plugin_name)
     if ON_HEROKU:
         asyncio.create_task(ping_server())
     b_users, b_chats = await db.get_banned()
@@ -82,12 +78,9 @@ async def start():
     await web.TCPSite(app, bind_address, PORT).start()
     await idle()
 
+
 if __name__ == '__main__':
     try:
-        # loop = asyncio.new_event_loop()
-        # asyncio.set_event_loop(loop)
         loop.run_until_complete(start())
     except KeyboardInterrupt:
         logging.info('Service Stopped Bye 👋')
-    finally:
-        loop.close()
