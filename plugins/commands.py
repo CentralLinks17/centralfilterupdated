@@ -7,37 +7,42 @@ from database.ia_filterdb import Media, get_file_details, unpack_new_file_id, ge
 from database.users_chats_db import db, delete_all_referal_users, get_referal_users_count, get_referal_all_users, referal_add_user
 from database.join_reqs import JoinReqs
 from info import CHANNELS, REQUEST_TO_JOIN_MODE, TRY_AGAIN_BTN, ADMINS, SHORTLINK_MODE, PREMIUM_AND_REFERAL_MODE, STREAM_MODE, AUTH_CHANNEL, OWNER_USERNAME, REFERAL_PREMEIUM_TIME, REFERAL_COUNT, PAYMENT_TEXT, PAYMENT_QR, LOG_CHANNEL, PICS, BATCH_FILE_CAPTION, CUSTOM_FILE_CAPTION, PROTECT_CONTENT, CHNL_LNK, GRP_LNK, REQST_CHANNEL, SUPPORT_CHAT_ID, SUPPORT_CHAT, MAX_B_TN, VERIFY, SHORTLINK_API, SHORTLINK_URL, TUTORIAL, VERIFY_TUTORIAL, IS_TUTORIAL, URL
-from utils import get_settings, pub_is_subscribed, get_size, is_subscribed, save_group_settings, temp, verify_user, check_token, check_verification, get_token, get_shortlink, get_tutorial, get_seconds
+from utils import get_settings, pub_is_subscribed, get_size, is_subscribed, save_group_settings, temp, verify_user, check_token, check_verification, get_token, get_shortlink, get_tutorial, get_seconds, send_all
 from database.connections_mdb import active_connection
 from urllib.parse import quote_plus
 from TechVJ.util.file_properties import get_name, get_hash, get_media_file_size
+
 logger = logging.getLogger(__name__)
 
 BATCH_FILES = {}
-join_db = JoinReqs
+#join_db = JoinReqs
 
 @Client.on_message(filters.command("start") & filters.incoming)
 async def start(client, message):
-    await message.react(emoji="🔥")
     if message.chat.type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
         buttons = [[
             InlineKeyboardButton('🔍 Search Movies/Series', switch_inline_query_current_chat='')
-        ],[
+            ],[
             InlineKeyboardButton('Earn Money 💸', callback_data="shortlink_info"),
             InlineKeyboardButton('⌬ Movies Channel', url='https://telegram.me/central_links')
-        ],[
+            ],[
             InlineKeyboardButton('Support 💁', url='https://telegram.me/CentralLinks_Contactbot'),
             InlineKeyboardButton('Request Invite 💁', url='https://telegram.me/CentralRequest')
-        ],[
+            ],[
             InlineKeyboardButton('🔻 Get Free/Paid subscription 🔻', callback_data='subscription')
-        ],[
+            ],[
             InlineKeyboardButton('〄 Help', callback_data='help'),
             InlineKeyboardButton('⍟ About', callback_data='about')
-        ],[
+            ],[
             InlineKeyboardButton('✇ Jᴏɪɴ Uᴘᴅᴀᴛᴇs Cʜᴀɴɴᴇʟ ✇', url='https://telegram.me/central_links')
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
-        await message.reply(script.START_TXT.format(message.from_user.mention if message.from_user else message.chat.title, temp.U_NAME, temp.B_NAME), reply_markup=reply_markup, disable_web_page_preview=True)
+        await message.reply_photo(
+            photo=random.choice(PICS),
+            caption=script.START_TXT.format(message.from_user.mention, temp.U_NAME, temp.B_NAME),
+            reply_markup=reply_markup,
+            parse_mode=enums.ParseMode.HTML
+        )
         await asyncio.sleep(2) # 😢 https://github.com/EvamariaTG/EvaMaria/blob/master/plugins/p_ttishow.py#L17 😬 wait a bit, before checking.
         if not await db.get_chat(message.chat.id):
             total=await client.get_chat_members_count(message.chat.id)
@@ -83,9 +88,6 @@ async def start(client, message):
                 InlineKeyboardButton('✇ Jᴏɪɴ Uᴘᴅᴀᴛᴇs Cʜᴀɴɴᴇʟ ✇', url='https://telegram.me/central_links')
             ]]
         reply_markup = InlineKeyboardMarkup(buttons)
-        m=await message.reply_sticker("CAACAgUAAxkBAAEKVaxlCWGs1Ri6ti45xliLiUeweCnu4AACBAADwSQxMYnlHW4Ls8gQMAQ") 
-        await asyncio.sleep(1)
-        await m.delete()
         await message.reply_photo(
             photo=random.choice(PICS),
             caption=script.START_TXT.format(message.from_user.mention, temp.U_NAME, temp.B_NAME),
@@ -103,15 +105,21 @@ async def start(client, message):
         except ChatAdminRequired:
             logger.error("Make sure bot is Admin in Updates Channel")
             return
-        btn = [[
-            InlineKeyboardButton("❆ Join Updates Channel ❆", url=invite_link.invite_link)
-        ]]
+        btn = [
+            [
+                InlineKeyboardButton(
+                    "❆ Join Our Updates Channel ❆", url=invite_link.invite_link
+                )
+            ]
+        ]
+
         if message.command[1] != "subscribe" and REQUEST_TO_JOIN_MODE == False:
             try:
                 kk, file_id = message.command[1].split("_", 1)
-                btn.append([InlineKeyboardButton("↻ Try Again", callback_data=f"checksub#{kk}#{file_id}")])
+                pre = 'checksubp' if kk == 'filep' else 'checksub' 
+                btn.append([InlineKeyboardButton("↻ Try Again", callback_data=f"{pre}#{file_id}")])
             except (IndexError, ValueError):
-                btn.append([InlineKeyboardButton("↻ Try Again", url=f"https://telegram.me/{temp.U_NAME}?start={message.command[1]}")])
+                btn.append([InlineKeyboardButton("↻ Tʀʏ Aɢᴀɪɴ", url=f"https://t.me/{temp.U_NAME}?start={message.command[1]}")])
         if REQUEST_TO_JOIN_MODE == True:
             if TRY_AGAIN_BTN == True:
                 text = "**எனது அப்டேட்ஸ் சேனலில் சேராமல் நீங்கள் எந்த கோப்பையும் பெற மாட்டீர்கள்... !! இப்போதே சேர்ந்து மீண்டும் முயற்சிக்கவும்\n\nYou are not the member of our @Central_Links Community's Update Channel that is given below so you Don't get the movie file ...\n\nIf you want the movie file, CLICK on then '❆ Join our Updates Channel ❆' Button below and after joining our updates channel, then click on the '↻ Try Again' Button below...\n\nThen You will get the movie files.**"
@@ -131,35 +139,35 @@ async def start(client, message):
         if PREMIUM_AND_REFERAL_MODE == True:
             buttons = [[
                 InlineKeyboardButton('🔍 Search Movies/Series', switch_inline_query_current_chat='')
-            ],[
+                ],[
                 InlineKeyboardButton('Earn Money 💸', callback_data="shortlink_info"),
                 InlineKeyboardButton('⌬ Movies Channel', url='https://telegram.me/central_links')
-            ],[
+                ],[
                 InlineKeyboardButton('Support 💁', url='https://telegram.me/CentralLinks_Contactbot'),
                 InlineKeyboardButton('Request Invite 💁', url='https://telegram.me/CentralRequest')
-            ],[
+                ],[
                 InlineKeyboardButton('🔻 Get Free/Paid subscription 🔻', callback_data='subscription')
-            ],[
+                ],[
                 InlineKeyboardButton('〄 Help', callback_data='help'),
                 InlineKeyboardButton('⍟ About', callback_data='about')
-            ],[
+                ],[
                 InlineKeyboardButton('✇ Jᴏɪɴ Uᴘᴅᴀᴛᴇs Cʜᴀɴɴᴇʟ ✇', url='https://telegram.me/central_links')
             ]]
         else:
             buttons = [[
                 InlineKeyboardButton('🔍 Search Movies/Series', switch_inline_query_current_chat='')
-            ],[
+                ],[
                 InlineKeyboardButton('Earn Money 💸', callback_data="shortlink_info"),
                 InlineKeyboardButton('⌬ Movies Channel', url='https://telegram.me/central_links')
-            ],[
+                ],[
                 InlineKeyboardButton('Support 💁', url='https://telegram.me/CentralLinks_Contactbot'),
                 InlineKeyboardButton('Request Invite 💁', url='https://telegram.me/CentralRequest')
-            ],[
+                ],[
                 InlineKeyboardButton('🔻 Get Free/Paid subscription 🔻', callback_data='subscription')
-            ],[
+                ],[
                 InlineKeyboardButton('〄 Help', callback_data='help'),
                 InlineKeyboardButton('⍟ About', callback_data='about')
-            ],[
+                ],[
                 InlineKeyboardButton('✇ Jᴏɪɴ Uᴘᴅᴀᴛᴇs Cʜᴀɴɴᴇʟ ✇', url='https://telegram.me/central_links')
             ]]
         reply_markup = InlineKeyboardMarkup(buttons)      
@@ -171,7 +179,7 @@ async def start(client, message):
         )
         return
     data = message.command[1]
-    if data.split("-", 1)[0] == "VJ":
+    if data.split("-", 1)[0] == "CL":
         user_id = int(data.split("-", 1)[1])
         vj = await referal_add_user(user_id, message.from_user.id)
         if vj and PREMIUM_AND_REFERAL_MODE == True:
@@ -191,42 +199,39 @@ async def start(client, message):
         else:
             if PREMIUM_AND_REFERAL_MODE == True:
                 buttons = [[
-                InlineKeyboardButton('🔍 Search Movies/Series', switch_inline_query_current_chat='')
-            ],[
-                InlineKeyboardButton('Earn Money 💸', callback_data="shortlink_info"),
-                InlineKeyboardButton('⌬ Movies Channel', url='https://telegram.me/central_links')
-            ],[
-                InlineKeyboardButton('Support 💁', url='https://telegram.me/CentralLinks_Contactbot'),
-                InlineKeyboardButton('Request Invite 💁', url='https://telegram.me/CentralRequest')
-            ],[
-                InlineKeyboardButton('🔻 Get Free/Paid subscription 🔻', callback_data='subscription')
-            ],[
-                InlineKeyboardButton('〄 Help', callback_data='help'),
-                InlineKeyboardButton('⍟ About', callback_data='about')
-            ],[
-                InlineKeyboardButton('✇ Jᴏɪɴ Uᴘᴅᴀᴛᴇs Cʜᴀɴɴᴇʟ ✇', url='https://telegram.me/central_links')
-            ]]
+                    InlineKeyboardButton('🔍 Search Movies/Series', switch_inline_query_current_chat='')
+                    ],[
+                    InlineKeyboardButton('Earn Money 💸', callback_data="shortlink_info"),
+                    InlineKeyboardButton('⌬ Movies Channel', url='https://telegram.me/central_links')
+                    ],[
+                    InlineKeyboardButton('Support 💁', url='https://telegram.me/CentralLinks_Contactbot'),
+                    InlineKeyboardButton('Request Invite 💁', url='https://telegram.me/CentralRequest')
+                    ],[
+                    InlineKeyboardButton('🔻 Get Free/Paid subscription 🔻', callback_data='subscription')
+                    ],[
+                    InlineKeyboardButton('〄 Help', callback_data='help'),
+                    InlineKeyboardButton('⍟ About', callback_data='about')
+                    ],[
+                    InlineKeyboardButton('✇ Jᴏɪɴ Uᴘᴅᴀᴛᴇs Cʜᴀɴɴᴇʟ ✇', url='https://telegram.me/central_links')
+                ]]
             else:
                 buttons = [[
-                InlineKeyboardButton('🔍 Search Movies/Series', switch_inline_query_current_chat='')
-            ],[
-                InlineKeyboardButton('Earn Money 💸', callback_data="shortlink_info"),
-                InlineKeyboardButton('⌬ Movies Channel', url='https://telegram.me/central_links')
-            ],[
-                InlineKeyboardButton('Support 💁', url='https://telegram.me/CentralLinks_Contactbot'),
-                InlineKeyboardButton('Request Invite 💁', url='https://telegram.me/CentralRequest')
-            ],[
-                InlineKeyboardButton('🔻 Get Free/Paid subscription 🔻', callback_data='subscription')
-            ],[
-                InlineKeyboardButton('〄 Help', callback_data='help'),
-                InlineKeyboardButton('⍟ About', callback_data='about')
-            ],[
-                InlineKeyboardButton('✇ Jᴏɪɴ Uᴘᴅᴀᴛᴇs Cʜᴀɴɴᴇʟ ✇', url='https://telegram.me/central_links')
-            ]]
+                    InlineKeyboardButton('🔍 Search Movies/Series', switch_inline_query_current_chat='')
+                    ],[
+                    InlineKeyboardButton('Earn Money 💸', callback_data="shortlink_info"),
+                    InlineKeyboardButton('⌬ Movies Channel', url='https://telegram.me/central_links')
+                    ],[
+                    InlineKeyboardButton('Support 💁', url='https://telegram.me/CentralLinks_Contactbot'),
+                    InlineKeyboardButton('Request Invite 💁', url='https://telegram.me/CentralRequest')
+                    ],[
+                    InlineKeyboardButton('🔻 Get Free/Paid subscription 🔻', callback_data='subscription')
+                    ],[
+                    InlineKeyboardButton('〄 Help', callback_data='help'),
+                    InlineKeyboardButton('⍟ About', callback_data='about')
+                    ],[
+                    InlineKeyboardButton('✇ Jᴏɪɴ Uᴘᴅᴀᴛᴇs Cʜᴀɴɴᴇʟ ✇', url='https://telegram.me/central_links')
+                ]]
             reply_markup = InlineKeyboardMarkup(buttons)
-            m=await message.reply_sticker("CAACAgUAAxkBAAEKVaxlCWGs1Ri6ti45xliLiUeweCnu4AACBAADwSQxMYnlHW4Ls8gQMAQ") 
-            await asyncio.sleep(1)
-            await m.delete()
             await message.reply_photo(
                 photo=random.choice(PICS),
                 caption=script.START_TXT.format(message.from_user.mention, temp.U_NAME, temp.B_NAME),
@@ -292,19 +297,19 @@ async def start(client, message):
                     button = [[
                         InlineKeyboardButton('Support Group', url=f'https://telegram.me/{SUPPORT_CHAT}'),
                         InlineKeyboardButton('Updates Channel', url=CHNL_LNK)
-                    ],[
+                        ],[
                         InlineKeyboardButton('𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥', url="https://telegram.me/Thiyaku_Suriya")
-                    ],[
+                        ],[
                         InlineKeyboardButton("🚀 Fast Download 🚀", url=download),  # we download Link
                         InlineKeyboardButton('🖥️ Watch online 🖥️', url=stream)
-                    ],[
+                        ],[
                         InlineKeyboardButton("• Watch in Web App •", web_app=WebAppInfo(url=stream))
                     ]]
                 else:
                     button = [[
                         InlineKeyboardButton('Support Group', url=f'https://telegram.me/{SUPPORT_CHAT}'),
                         InlineKeyboardButton('Updates Channel', url=CHNL_LNK)
-                    ],[
+                        ],[
                         InlineKeyboardButton('𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥', url="https://telegram.me/Thiyaku_Suriya")
                     ]]
                 msg = await client.send_cached_media(
@@ -324,7 +329,7 @@ async def start(client, message):
                     file_id=msg.get("file_id"),
                     caption=f_caption,
                     protect_content=msg.get('protect', False),
-                    reply_markup=InlineKeyboardMarkup(button)
+                    reply_markup=InlineKeyboardMarkup([ [ InlineKeyboardButton('▸ Share & Support us ◂', url='https://telegram.dog/Central_Links') ] ] )
                 )
                 filesarr.append(msg)
                 k = await client.send_message(chat_id = message.from_user.id, text=f"<b><u>❗️❗️❗️IMPORTANT❗️️❗️❗️</u></b>\n\nThis Movie Files/Videos will be deleted in <b><u>10 mins</u> 🫥 <i></b>(Due to Copyright Issues)</i>.\n\n<b><i>Please forward this ALL Files/Videos to your Saved Messages and Start Download there</i>\n@Central_Links</b>")
@@ -397,26 +402,41 @@ async def start(client, message):
         if str(message.from_user.id) != str(userid):
             return await message.reply_text(
                 text="<b>Invalid link or Expired link !</b>",
-                protect_content=True
+                protect_content=True if PROTECT_CONTENT else False
             )
         is_valid = await check_token(client, userid, token)
         if is_valid == True:
+            if fileid == "send_all":
+                btn = [[
+                    InlineKeyboardButton("Get File", callback_data=f"checksub#send_all")
+                ]]
+                await verify_user(client, userid, token)
+                await message.reply_text(
+                    text=f"<b>Hey {message.from_user.mention}, You are successfully verified!\nNow you have unlimited access for all movies till today midnight.</b>",
+                    protect_content=True,
+                    reply_markup=InlineKeyboardMarkup(btn)
+                )
+                return
+            btn = [[
+                InlineKeyboardButton("Get File", url=f"https://telegram.me/{temp.U_NAME}?start=files_{fileid}")
+            ]]
             await message.reply_text(
                 text=f"<b>Hey {message.from_user.mention}, You are successfully verified !\nNow you have unlimited access for all movies till today midnight.</b>",
-                protect_content=True
+                protect_content=True if PROTECT_CONTENT else False,
+                reply_markup=InlineKeyboardMarkup(btn)
             )
             await verify_user(client, userid, token)
         else:
             return await message.reply_text(
                 text="<b>Invalid link or Expired link !</b>",
-                protect_content=True
+                protect_content=True if PROTECT_CONTENT else False
             )
     if data.startswith("sendfiles"):
         chat_id = int("-" + file_id.split("-")[1])
         userid = message.from_user.id if message.from_user else None
         settings = await get_settings(chat_id)
         g = await get_shortlink(chat_id, f"https://telegram.me/{temp.U_NAME}?start=allfiles_{file_id}")
-        k = await client.send_message(chat_id=message.from_user.id,text=f"<b>Get All Files in a Single Click!!!\n\n📂 Link: {g}\n\n<i>Note: This message is deleted in 5 mins to avoid copyrights. Save the link to Somewhere else</i>\n@Central_Links</b>", reply_markup=InlineKeyboardMarkup(
+        k = await client.send_message(chat_id=message.from_user.id,text=f"<b>Get All Files in a Single Click!!!\n\n📂 Link: {g}\n\n<i>Note: This message is deleted in 2 mins to avoid copyrights. Save the link to Somewhere else</i>\n@Central_Links</b>", reply_markup=InlineKeyboardMarkup(
                 [
                     [
                         InlineKeyboardButton('📂 Download Now 📂', url=g)
@@ -426,7 +446,7 @@ async def start(client, message):
                 ]
             )
         )
-        await asyncio.sleep(300)
+        await asyncio.sleep(120)
         await k.edit("<b>Your message is successfully deleted!!!</b>")
         return
         
@@ -461,7 +481,7 @@ async def start(client, message):
             file_id = file.file_id
             files_ = await get_file_details(file_id)
             files1 = files_[0]
-            title = ' '.join(filter(lambda x: not x.startswith('[') and not x.startswith('@'), files1.file_name.split()))
+            title = ' '.join(files1.file_name.split())
             size=get_size(files1.file_size)
             f_caption=files1.caption
             if CUSTOM_FILE_CAPTION:
@@ -471,7 +491,7 @@ async def start(client, message):
                     logger.exception(e)
                     f_caption=f_caption
             if f_caption is None:
-                f_caption = f"{' '.join(filter(lambda x: not x.startswith('[') and not x.startswith('@'), files1.file_name.split()))}"
+                f_caption = f"{files1.file_name}"
             if not await db.has_premium_access(message.from_user.id):
                 if not await check_verification(client, message.from_user.id) and VERIFY == True:
                     btn = [[
@@ -489,19 +509,19 @@ async def start(client, message):
                 button = [[
                     InlineKeyboardButton('Support Group', url=f'https://telegram.me/{SUPPORT_CHAT}'),
                     InlineKeyboardButton('Updates Channel', url=CHNL_LNK)
-                ],[
+                    ],[
                     InlineKeyboardButton('𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥', url="https://telegram.me/Thiyaku_Suriya")
-                ],[
+                    ],[
                     InlineKeyboardButton("🚀 Fast Download 🚀", url=download),  # we download Link
                     InlineKeyboardButton('🖥️ Watch online 🖥️', url=stream)
-                ],[
+                    ],[
                     InlineKeyboardButton("• Watch in Web App •", web_app=WebAppInfo(url=stream))
                 ]]
             else:
                 button = [[
                     InlineKeyboardButton('Support Group', url=f'https://telegram.me/{SUPPORT_CHAT}'),
                     InlineKeyboardButton('Updates Channel', url=CHNL_LNK)
-                ],[
+                    ],[
                     InlineKeyboardButton('𝗕𝗢𝗧 𝗢𝗪𝗡𝗘𝗥', url="https://telegram.me/Thiyaku_Suriya")
                 ]]
             msg = await client.send_cached_media(
@@ -509,7 +529,7 @@ async def start(client, message):
                 file_id=file_id,
                 caption=f_caption,
                 protect_content=True if pre == 'filep' else False,
-                reply_markup=InlineKeyboardMarkup(button)
+                reply_markup=InlineKeyboardMarkup([ [ InlineKeyboardButton('▸ Share & Support Us ◂', url='https://telegram.dog/Central_Links') ] ] )
             )
             filesarr.append(msg)
         k = await client.send_message(chat_id = message.from_user.id, text=f"<b><u>❗️❗️❗️IMPORTANT❗️️❗️❗️</u></b>\n\nThis Movie Files/Videos will be deleted in <b><u>10 mins</u> 🫥 <i></b>(Due to Copyright Issues)</i>.\n\n<b><i>Please forward this ALL Files/Videos to your Saved Messages and Start Download there</i>\n@Central_Links</b>")
@@ -522,7 +542,7 @@ async def start(client, message):
     elif data.startswith("files"):
         user = message.from_user.id
         if temp.SHORT.get(user)==None:
-            await message.reply_text(text="<b>Please Search Again in Group</b>")
+            await message.reply_text(text="<b>Please search again in group</b>")
         else:
             chat_id = temp.SHORT.get(user)
         settings = await get_settings(chat_id)
@@ -584,13 +604,13 @@ async def start(client, message):
                 chat_id=message.from_user.id,
                 file_id=file_id,
                 protect_content=True if pre == 'filep' else False,
-                reply_markup=InlineKeyboardMarkup(button)
+                reply_markup=InlineKeyboardMarkup([ [ InlineKeyboardButton('▸ Share & Support Us ◂', url='https://telegram.dog/Central_Links') ] ] )
             )
             filetype = msg.media
             file = getattr(msg, filetype.value)
-            title = '@Central_Links  ' + ' '.join(filter(lambda x: not x.startswith('[') and not x.startswith('@'), file.file_name.split()))
+            title = ' '.join(file.file_name.split())
             size=get_size(file.file_size)
-            f_caption = f"<code>{title}</code>"
+            f_caption = file.file_caption
             if CUSTOM_FILE_CAPTION:
                 try:
                     f_caption=CUSTOM_FILE_CAPTION.format(file_name= '' if title is None else title, file_size='' if size is None else size, file_caption='')
@@ -598,7 +618,7 @@ async def start(client, message):
                     return
             await msg.edit_caption(
                 caption=f_caption,
-                reply_markup=InlineKeyboardMarkup(button)
+                reply_markup=InlineKeyboardMarkup([ [ InlineKeyboardButton('▸ Share & Support Us ◂', url='https://telegram.dog/Central_Links') ] ] )
             )
             btn = [[
                 InlineKeyboardButton("Get File Again", callback_data=f'delfile#{file_id}')
@@ -612,9 +632,9 @@ async def start(client, message):
             pass
         return await message.reply('No such file exist.')
     files = files_[0]
-    title = '@Central_Links  ' + ' '.join(filter(lambda x: not x.startswith('[') and not x.startswith('@'), files.file_name.split()))
+    title = ' '.join(files.file_name.split())
     size=get_size(files.file_size)
-    f_caption=files.caption
+    f_caption=files.file_caption
     if CUSTOM_FILE_CAPTION:
         try:
             f_caption=CUSTOM_FILE_CAPTION.format(file_name= '' if title is None else title, file_size='' if size is None else size, file_caption='' if f_caption is None else f_caption)
@@ -622,7 +642,7 @@ async def start(client, message):
             logger.exception(e)
             f_caption=f_caption
     if f_caption is None:
-        f_caption = f"@Central_Links  {' '.join(filter(lambda x: not x.startswith('[') and not x.startswith('@'), files.file_name.split()))}"
+        f_caption = ' '.join(files.file_name.split())
     if not await db.has_premium_access(message.from_user.id):
         if not await check_verification(client, message.from_user.id) and VERIFY == True:
             btn = [[
@@ -660,7 +680,7 @@ async def start(client, message):
         file_id=file_id,
         caption=f_caption,
         protect_content=True if pre == 'filep' else False,
-        reply_markup=InlineKeyboardMarkup(button)
+        reply_markup=InlineKeyboardMarkup([ [ InlineKeyboardButton('▸ Share & Support Us ◂', url='https://telegram.dog/Central_Links') ] ] )
     )
     btn = [[
         InlineKeyboardButton("Get File Again", callback_data=f'delfile#{file_id}')
@@ -703,7 +723,7 @@ async def channel_info(bot, message):
 @Client.on_message(filters.command('logs') & filters.user(ADMINS))
 async def log_file(bot, message):
     try:
-        await message.reply_document('TELEGRAM BOT.LOG')
+        await message.reply_document('Logs.txt')
     except Exception as e:
         await message.reply(str(e))
 
@@ -779,8 +799,8 @@ async def delete_all_index(bot, message):
 @Client.on_callback_query(filters.regex(r'^autofilter_delete'))
 async def delete_all_index_confirm(bot, message):
     await Media.collection.drop()
-    await message.answer('Piracy Is Crime')
-    await message.message.edit('Succesfully Deleted All The Indexed Files.')
+    await message.answer('Nothing is Permanent - @Central_Links')
+    await message.message.edit('Succesfully deleted all the indexed files.')
 
 
 @Client.on_message(filters.command('settings'))
@@ -833,7 +853,7 @@ async def settings(client, message):
     else:
         pass
 
-    if SHORTLINK_MODE == True:
+    if settings is not None:
         buttons = [
             [
                 InlineKeyboardButton(
@@ -841,7 +861,7 @@ async def settings(client, message):
                     callback_data=f'setgs#button#{settings["button"]}#{grp_id}',
                 ),
                 InlineKeyboardButton(
-                    'Button' if settings["button"] else 'Tᴇxᴛ',
+                    'Button' if settings["button"] else 'Text',
                     callback_data=f'setgs#button#{settings["button"]}#{grp_id}',
                 ),
             ],
@@ -936,100 +956,6 @@ async def settings(client, message):
                 ),
             ],
         ]
-    else:
-        buttons = [
-            [
-                InlineKeyboardButton(
-                    'Result Page',
-                    callback_data=f'setgs#button#{settings["button"]}#{grp_id}',
-                ),
-                InlineKeyboardButton(
-                    'Button' if settings["button"] else 'Tᴇxᴛ',
-                    callback_data=f'setgs#button#{settings["button"]}#{grp_id}',
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    'File Send Mode',
-                    callback_data=f'setgs#botpm#{settings["botpm"]}#{grp_id}',
-                ),
-                InlineKeyboardButton(
-                    'Manual Start' if settings["botpm"] else 'Auto Send',
-                    callback_data=f'setgs#botpm#{settings["botpm"]}#{grp_id}',
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    'Protect Content',
-                    callback_data=f'setgs#file_secure#{settings["file_secure"]}#{grp_id}',
-                ),
-                InlineKeyboardButton(
-                    '✔ ON' if settings["file_secure"] else '✘ OFF',
-                    callback_data=f'setgs#file_secure#{settings["file_secure"]}#{grp_id}',
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    'IMDB',
-                    callback_data=f'setgs#imdb#{settings["imdb"]}#{grp_id}',
-                ),
-                InlineKeyboardButton(
-                    '✔ ON' if settings["imdb"] else '✘ OFF',
-                    callback_data=f'setgs#imdb#{settings["imdb"]}#{grp_id}',
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    'Spell Check',
-                    callback_data=f'setgs#spell_check#{settings["spell_check"]}#{grp_id}',
-                ),
-                InlineKeyboardButton(
-                    '✔ ON' if settings["spell_check"] else '✘ OFF',
-                    callback_data=f'setgs#spell_check#{settings["spell_check"]}#{grp_id}',
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    'Welcome Message',
-                    callback_data=f'setgs#welcome#{settings["welcome"]}#{grp_id}',
-                ),
-                InlineKeyboardButton(
-                    '✔ ON' if settings["welcome"] else '✘ OFF',
-                    callback_data=f'setgs#welcome#{settings["welcome"]}#{grp_id}',
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    'Auto-Delete',
-                    callback_data=f'setgs#auto_delete#{settings["auto_delete"]}#{grp_id}',
-                ),
-                InlineKeyboardButton(
-                    '10 Mins' if settings["auto_delete"] else '✘ OFF',
-                    callback_data=f'setgs#auto_delete#{settings["auto_delete"]}#{grp_id}',
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    'Auto-Filter',
-                    callback_data=f'setgs#auto_ffilter#{settings["auto_ffilter"]}#{grp_id}',
-                ),
-                InlineKeyboardButton(
-                    '✔ ON' if settings["auto_ffilter"] else '✘ OFF',
-                    callback_data=f'setgs#auto_ffilter#{settings["auto_ffilter"]}#{grp_id}',
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    'Max Buttons',
-                    callback_data=f'setgs#max_btn#{settings["max_btn"]}#{grp_id}',
-                ),
-                InlineKeyboardButton(
-                    '10' if settings["max_btn"] else f'{MAX_B_TN}',
-                    callback_data=f'setgs#max_btn#{settings["max_btn"]}#{grp_id}',
-                ),
-            ],
-        ]
-    if settings is not None:
         btn = [[
                 InlineKeyboardButton("Open Here ↓", callback_data=f"opnsetgrp#{grp_id}"),
                 InlineKeyboardButton("Open in PM⇲", callback_data=f"opnsetpm#{grp_id}")
@@ -1172,9 +1098,8 @@ async def requests(bot, message):
         success = False
     
     if success:
-        link = await bot.create_chat_invite_link(int(REQST_CHANNEL))
         btn = [[
-                InlineKeyboardButton('Join Channel', url=link.invite_link),
+                InlineKeyboardButton('Join Channel', url='https://t.me/Central_Links'),
                 InlineKeyboardButton('View Request', url=f"{reported_post.link}")
               ]]
         await message.reply_text("<b>Your request has been added! Please wait for some time.\n\nJoin Channel First & View Request</b>", reply_markup=InlineKeyboardMarkup(btn))
@@ -1216,9 +1141,9 @@ async def deletemultiplefiles(bot, message):
         keyword = message.text.split(" ", 1)[1]
     except:
         return await message.reply_text(f"<b>Hey {message.from_user.mention}, Give me a keyword along with the command to delete files.</b>")
-    k = await bot.send_message(chat_id=message.chat.id, text=f"<b>Fetching Files for your query {keyword} on DB... Please wait...</b>")
-    files, total = await get_bad_files(keyword)
-    await k.delete()
+    # k = await bot.send_message(chat_id=message.chat.id, text=f"<b>Fetching Files for your query {keyword} on DB... Please wait...</b>")
+    # files, total = await get_bad_files(keyword)
+    # await k.delete()
     #await k.edit_text(f"<b>Found {total} files for your query {keyword} !\n\nFile deletion process will start in 5 seconds !</b>")
     #await asyncio.sleep(5)
     btn = [[
@@ -1232,7 +1157,7 @@ async def deletemultiplefiles(bot, message):
         parse_mode=enums.ParseMode.HTML
     )
 
-@Client.on_message(filters.command("shortlink"))
+@Client.on_message(filters.command("shortlink") & filters.user(ADMINS))
 async def shortlink(bot, message):
     if SHORTLINK_MODE == False:
         return 
@@ -1257,7 +1182,7 @@ async def shortlink(bot, message):
     try:
         command, shortlink_url, api = data.split(" ")
     except:
-        return await message.reply_text("<b>Command Incomplete :(\n\nGive me a shortener website link and api along with the command !\n\nFormat: <code>/shortlink kpslink.in e3d82cdf8f9f4783c42170b515d1c271fb1c4500</code></b>")
+        return await message.reply_text("<b>Command Incomplete :(\n\nGive me a shortener website link and api along with the command !\n\nFormat: <code>/shortlink earnwithlink.com 14de6aaacf1601fe7b7c1de78d154dacb970dbe4</code></b>")
     reply = await message.reply_text("<b>Please Wait...</b>")
     shortlink_url = re.sub(r"https?://?", "", shortlink_url)
     shortlink_url = re.sub(r"[:/]", "", shortlink_url)
@@ -1396,7 +1321,7 @@ async def removetutorial(bot, message):
 @Client.on_message(filters.command("restart") & filters.user(ADMINS))
 async def stop_button(bot, message):
     msg = await bot.send_message(text="**🔄 𝙿𝚁𝙾𝙲𝙴𝚂𝚂𝙴𝚂 𝚂𝚃𝙾𝙿𝙴𝙳. 𝙱𝙾𝚃 𝙸𝚂 𝚁𝙴𝚂𝚃𝙰𝚁𝚃𝙸𝙽𝙶...**", chat_id=message.chat.id)       
-    await asyncio.sleep(3)
+    await asyncio.sleep(60)
     await msg.edit("**✅️ 𝙱𝙾𝚃 𝙸𝚂 𝚁𝙴𝚂𝚃𝙰𝚁𝚃𝙴𝙳. 𝙽𝙾𝚆 𝚈𝙾𝚄 𝙲𝙰𝙽 𝚄𝚂𝙴 𝙼𝙴**")
     os.execl(sys.executable, sys.executable, *sys.argv)
 
