@@ -1,4 +1,4 @@
-import os, logging, time
+import os, logging, time, asyncio
 from pyrogram import Client, filters, enums
 from pyrogram.errors.exceptions.bad_request_400 import UserNotParticipant, MediaEmpty, PhotoInvalidDimensions, WebpageMediaEmpty
 from info import IMDB_TEMPLATE
@@ -129,11 +129,11 @@ async def who_is(client, message):
 @Client.on_message(filters.command(["imdb", 'search']))
 async def imdb_search(client, message):
     if ' ' in message.text:
-        k = await message.reply('Searching ImDB')
+        k = await message.reply('Searching IMDb')
         r, title = message.text.split(None, 1)
         movies = await get_poster(title, bulk=True)
         if not movies:
-            return await message.reply("No results Found")
+            return await message.reply("No results found")
         btn = [
             [
                 InlineKeyboardButton(
@@ -144,6 +144,9 @@ async def imdb_search(client, message):
             for movie in movies
         ]
         await k.edit('Here is what i found on IMDb', reply_markup=InlineKeyboardMarkup(btn))
+        await asyncio.sleep(600)
+        await message.delete()
+        await k.delete()
     else:
         await message.reply('Give me a movie / series Name')
 
