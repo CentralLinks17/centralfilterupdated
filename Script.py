@@ -1,4 +1,4 @@
-class Script(object):
+class script(object):
     START_TXT = """<b><blockquote>Hello {}, My name is <a href=https://t.me/{}>{}</a></blockquote>
     
 ✯ I am the latest advanced and powerful auto filter bot with awesome filter, file store bot, manual filter, customized shortener support and best UI performance
