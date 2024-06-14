@@ -78,22 +78,21 @@ Commands and Usage:
 <b>Note:</b>
 My features stay here new features coming soon...  
  <b>✯ Maintained by: <a href=https://t.me/Thiyaku_Suriya>☢Thiyaku Suriya☢</a></b>
-  
  <b>✯ Join here: <a href=https://t.me/central_links>☢Join my updates channel☢</a></b> 
-  
- ./id - <code>get ID of a specified user.</code> 
-  
- ./info - <code>get information about a user.</code> 
-  
- ./song - Download any song [<code>example /song vaa vaathi song</code>] 
-  
- ./telegraph - <code>Telegraph generator send under 5MB video or photo I give telegraph link</code> 
-  
- ./tts - <code>This command usage text to voice converter</code> 
-  
- ./video - This command usage any YouTube video download HD [<code>example /video https://youtu.be/Aiue8PMuD-k</code>]
+   ./id - <code>get ID of a specified user.</code> 
+   ./info - <code>get information about a user.</code> 
+   ./song - Download any song [<code>example /song vaa vaathi song</code>] 
+   ./telegraph - <code>Telegraph generator send under 5MB video or photo I give telegraph link</code> 
+   ./tts - <code>This command usage text to voice converter</code> 
+   ./video - This command usage any YouTube video download HD [<code>example /video https://youtu.be/Aiue8PMuD-k</code>]
+   ./font - This command usage stylish and cool font generator [<code>example /font hi</code>]"""
+    SOURCE_TXT = """
+<b>Hey, This is an Open Source Project.
 
- ./font - This command usage stylish and cool font generator [<code>example /font hi</code>]"""
+This Bot has Latest and Advanced Features⚡️
+
+Want this Bot Repo? - <a href='https://t.me/thiyaku_suriya'>Contact Here</a> 🙃
+"""
 
     ADMIN_TXT = """Help: Admin Mods
 <b>Note:</b>
@@ -177,10 +176,24 @@ After 5 minutes this message will be automatically deleted
 
 If you do not see the requested movie/series file, look at the next page"""
 
-    SELECT = """Select your preferred language, quality, season and episode"""
+    SELECT = """MOVIES ➢ Select "Languages"
+
+SERIES ➢ Select "Seasons"
+
+Tip: Select "Languages" or "Seasons" Button and Click "Send All" To get All File Links in a Single click"""
 
     SINFO = """
-🫣 For movie join first then click on try again button 😅"""
+⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯
+Series Request Format
+⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯⋯
+
+Go to Google ➠ Type Series Name ➠ Copy Correct Name ➠ Paste this Group
+
+Example: Loki S01E01
+
+🚯 Don't use ➠ ':(!,./)
+"""
+
 
     NORSLTS = """
 ★ #NoResults ★
@@ -193,8 +206,9 @@ Message <b>: {}</b>"""
 
     CAPTION = """<b>📂Filename: {file_caption}</b>
 <b> Size ⚙️: {file_size}
-
-@Central_Links X @CentralRequest</b>"""
+╔════════ Join with us ════════╗
+@Central_Links X @CentralRequest
+╚════════ Join with us ════════╝</b>"""
 
     IMDB_TEMPLATE_TXT = """
 <b>Query: {query}
