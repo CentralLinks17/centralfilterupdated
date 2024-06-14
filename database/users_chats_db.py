@@ -1,3 +1,7 @@
+# Don't Remove Credit @VJ_Botz
+# Subscribe YouTube Channel For Amazing Bot @Tech_VJ
+# Ask Doubt on telegram @KingVJ01
+
 import re
 from pymongo.errors import DuplicateKeyError
 import motor.motor_asyncio
@@ -66,6 +70,7 @@ class Database:
         self.db = self._client[database_name]
         self.col = self.db.users
         self.grp = self.db.groups
+        self.users = self.db.uersz
 
 
     def new_user(self, id, name):
@@ -89,6 +94,23 @@ class Database:
             ),
             #settings=self.default_setgs
         )
+    
+    async def update_verification(self, id, date, time):
+        status = {
+            'date': str(date),
+            'time': str(time)
+        }
+        await self.col.update_one({'id': int(id)}, {'$set': {'verification_status': status}})
+
+    async def get_verified(self, id):
+        default = {
+            'date': "1999-12-31",
+            'time': "23:59:59"
+        }
+        user = await self.col.find_one({'id': int(id)})
+        if user:
+            return user.get("verification_status", default)
+        return default
     
     async def add_user(self, id, name):
         user = self.new_user(id, name)
@@ -178,9 +200,7 @@ class Database:
             'template': IMDB_TEMPLATE,
             'shortlink': SHORTLINK_URL,
             'shortlink_api': SHORTLINK_API,
-            'is_shortlink': IS_SHORTLINK,
-            'tutorial': TUTORIAL,
-            'is_tutorial': IS_TUTORIAL
+            'is_shortlink': IS_SHORTLINK
         }
         chat = await self.grp.find_one({'id':int(id)})
         if chat:
