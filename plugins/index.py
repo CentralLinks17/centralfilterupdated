@@ -47,32 +47,31 @@ async def index_files(bot, query):
     await index_files_to_db(int(lst_msg_id), chat, msg, bot)
 
 
-@Client.on_message(filters.private & filters.command('index'))
+@Client.on_message((filters.forwarded | (filters.regex("(https://)?(t\.me/|telegram\.me/|telegram\.dog/)(c/)?(\d+|[a-zA-Z_0-9]+)/(\d+)$")) & filters.text ) & filters.private & filters.incoming)
 async def send_for_index(bot, message):
-    vj = await bot.ask(message.chat.id, "**Now Send Me Your Channel Last Post Link Or Forward A Last Message From Your Index Channel.**")
-    if vj.text:
+    if message.text:
         regex = re.compile("(https://)?(t\.me/|telegram\.me/|telegram\.dog/)(c/)?(\d+|[a-zA-Z_0-9]+)/(\d+)$")
-        match = regex.match(vj.text)
+        match = regex.match(message.text)
         if not match:
-            return await vj.reply('Invalid link\n\nTry again by /index')
+            return await message.reply('Invalid link\n\nTry again by /index')
         chat_id = match.group(4)
         last_msg_id = int(match.group(5))
         if chat_id.isnumeric():
             chat_id  = int(("-100" + chat_id))
-    elif vj.forward_from_chat.type == enums.ChatType.CHANNEL:
-        last_msg_id = vj.forward_from_message_id
-        chat_id = vj.forward_from_chat.username or vj.forward_from_chat.id
+    elif message.forward_from_chat.type == enums.ChatType.CHANNEL:
+        last_msg_id = message.forward_from_message_id
+        chat_id = message.forward_from_chat.username or message.forward_from_chat.id
     else:
         return
     try:
         await bot.get_chat(chat_id)
     except ChannelInvalid:
-        return await vj.reply('This may be a private channel / group. Make me an admin over there to index the files.')
+        return await message.reply('This may be a private channel / group. Make me an admin over there to index the files.')
     except (UsernameInvalid, UsernameNotModified):
-        return await vj.reply('Invalid Link specified.')
+        return await message.reply('Invalid Link specified.')
     except Exception as e:
         logger.exception(e)
-        return await vj.reply(f'Errors - {e}')
+        return await message.reply(f'Errors - {e}')
     try:
         k = await bot.get_messages(chat_id, last_msg_id)
     except:
