@@ -17,7 +17,7 @@ from TechVJ.util.file_properties import get_name, get_hash, get_media_file_size
 from plugins.Extra.save_restrict_content.save import run_save, get_link
 from plugins.Extra.save_restrict_content.join import join
 
-BOT_START_TIME = time.time()
+#BOT_START_TIME = time.time()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
 lock = asyncio.Lock()
