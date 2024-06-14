@@ -1,7 +1,3 @@
-# Don't Remove Credit @VJ_Botz
-# Subscribe YouTube Channel For Amazing Bot @Tech_VJ
-# Ask Doubt on telegram @KingVJ01
-
 import math
 import time 
 from Script import script
@@ -40,7 +36,7 @@ async def progress_for_pyrogram(current, total, ud_type, message, start):
             await message.edit(
                 text="{}\n\n{}".format(ud_type, tmp),               
                 reply_markup=InlineKeyboardMarkup( [[
-                    InlineKeyboardButton("✖️ Cancel ✖️", callback_data="cancel")
+                    InlineKeyboardButton("✖️ CANCEL ✖️", callback_data="cancel")
                     ]]
                 )
             )
@@ -79,8 +75,3 @@ def convert(seconds):
     minutes = seconds // 60
     seconds %= 60      
     return "%d:%02d:%02d" % (hour, minutes, seconds)
-
-
-
-
-
