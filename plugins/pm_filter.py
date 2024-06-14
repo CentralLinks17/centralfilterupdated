@@ -113,7 +113,7 @@ async def pm_text(bot, message):
         await auto_filter(bot, content, message, reply_msg, ai_search)
     else:
         await message.reply_text(text = f'<b>Hey {user} 😍,\n\nYou can\'t get movies from here. Request it in our <a href="https://t.me/centralrequest">Central Request</a> or click the request here button below 👇</b>', reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("📝 Request Here ", url=f"https://t.me/centralrequest")]]))
-                    await bot.send_message(chat_id=LOG_CHANNEL, text=f"<b>#𝐏𝐌_𝐌𝐒𝐆\n\nName : {user}\n\nID : {user_id}\n\nMessage : {content}</b>")
+        await bot.send_message(chat_id=LOG_CHANNEL, text=f"<b>#𝐏𝐌_𝐌𝐒𝐆\n\nName : {user}\n\nID : {user_id}\n\nMessage : {content}</b>")
 
 @Client.on_callback_query(filters.regex(r"^next"))
 async def next_page(bot, query):
