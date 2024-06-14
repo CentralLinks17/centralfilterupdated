@@ -37,10 +37,7 @@ async def start(client, message):
             InlineKeyboardButton('✇ Jᴏɪɴ Uᴘᴅᴀᴛᴇs Cʜᴀɴɴᴇʟ ✇', url='https://telegram.me/central_links')
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
-        await message.reply_photo(
-            photo=random.choice(PICS),
-            caption=script.START_TXT.format(message.from_user.mention, temp.U_NAME, temp.B_NAME),
-            reply_markup=reply_markup,
+        await message.reply_photoscript.START_TXT.format(message.from_user.mention if message.from_user else message.chat.title, temp.U_NAME, temp.B_NAME), reply_markup=reply_markup, disable_web_page_preview=True,
             parse_mode=enums.ParseMode.HTML
         )
         await asyncio.sleep(2) # 😢 https://github.com/EvamariaTG/EvaMaria/blob/master/plugins/p_ttishow.py#L17 😬 wait a bit, before checking.
@@ -491,7 +488,7 @@ async def start(client, message):
                     logger.exception(e)
                     f_caption=f_caption
             if f_caption is None:
-                f_caption = f"{files1.file_name}"
+                f_caption = f"{files1.file_name.split()}"
             if not await db.has_premium_access(message.from_user.id):
                 if not await check_verification(client, message.from_user.id) and VERIFY == True:
                     btn = [[
@@ -542,7 +539,7 @@ async def start(client, message):
     elif data.startswith("files"):
         user = message.from_user.id
         if temp.SHORT.get(user)==None:
-            await message.reply_text(text="<b>Please search again in group</b>")
+            return await message.reply_text(text="<b>Please search again in group</b>")
         else:
             chat_id = temp.SHORT.get(user)
         settings = await get_settings(chat_id)
@@ -1098,6 +1095,14 @@ async def requests(bot, message):
         success = False
     
     if success:
+        '''if isinstance(REQST_CHANNEL, (int, str)):
+            channels = [REQST_CHANNEL]
+        elif isinstance(REQST_CHANNEL, list):
+            channels = REQST_CHANNEL
+        for channel in channels:
+            chat = await bot.get_chat(channel)
+        #chat = int(chat)'''
+        link = await bot.create_chat_invite_link(int(REQST_CHANNEL))
         btn = [[
                 InlineKeyboardButton('Join Channel', url='https://t.me/Central_Links'),
                 InlineKeyboardButton('View Request', url=f"{reported_post.link}")
@@ -1157,7 +1162,7 @@ async def deletemultiplefiles(bot, message):
         parse_mode=enums.ParseMode.HTML
     )
 
-@Client.on_message(filters.command("shortlink") & filters.user(ADMINS))
+@Client.on_message(filters.command("shortlink"))
 async def shortlink(bot, message):
     if SHORTLINK_MODE == False:
         return 
@@ -1191,7 +1196,7 @@ async def shortlink(bot, message):
     await save_group_settings(grpid, 'is_shortlink', True)
     await reply.edit_text(f"<b>Successfully added shortlink API for {title}.\n\nCurrent Shortlink Website: <code>{shortlink_url}</code>\nCurrent API: <code>{api}</code></b>")
     
-@Client.on_message(filters.command("setshortlinkoff"))
+@Client.on_message(filters.command("setshortlinkoff") & filters.user(ADMINS))
 async def offshortlink(bot, message):
     if SHORTLINK_MODE == False:
         return 
@@ -1207,7 +1212,7 @@ async def offshortlink(bot, message):
     # ENABLE_SHORTLINK = False
     return await message.reply_text("Successfully disabled shortlink")
     
-@Client.on_message(filters.command("setshortlinkon"))
+@Client.on_message(filters.command("setshortlinkon") & filters.user(ADMINS))
 async def onshortlink(bot, message):
     if SHORTLINK_MODE == False:
         return 
