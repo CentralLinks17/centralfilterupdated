@@ -320,4 +320,3 @@ def get_link(string):
             return False
     except Exception:
         return False
-
