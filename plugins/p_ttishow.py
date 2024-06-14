@@ -1,15 +1,17 @@
-import os, string, logging, random, asyncio, time, datetime, re, sys, json, base64
+import os, string, logging, random, asyncio, time, datetime, re, sys, json, base64, shutil, psutil
 from Script import script
 from pyrogram import Client, filters, enums
 from pyrogram.errors import ChatAdminRequired, FloodWait
 from pyrogram.types import *
-from database.ia_filterdb import Media, get_file_details, unpack_new_file_id, get_bad_files
+from database.ia_filterdb import Media, db as clientDB, get_file_details, unpack_new_file_id, get_bad_files
 from database.users_chats_db import db, delete_all_referal_users, get_referal_users_count, get_referal_all_users, referal_add_user
 from database.join_reqs import JoinReqs
 from info import *
 from pyrogram.errors.exceptions.bad_request_400 import MessageTooLong, PeerIdInvalid
 from utils import get_settings, pub_is_subscribed, get_size, is_subscribed, save_group_settings, temp, verify_user, check_token, check_verification, get_token, get_shortlink, get_tutorial, get_seconds
 from database.connections_mdb import active_connection
+
+BOT_START_TIME = time.time()
 
 @Client.on_message(filters.new_chat_members & filters.group)
 async def save_group(bot, message):
@@ -27,7 +29,7 @@ async def save_group(bot, message):
             ]]
             reply_markup=InlineKeyboardMarkup(buttons)
             k = await message.reply(
-                text='<b>CHAT NOT ALLOWED 🐞\n\nMy admins has restricted me from working here ! If you want to know more about it contact support [@CentralLinks_Contactbot] for paid work..</b>',
+                text='<b>CHAT NOT ALLOWED 🐞\n\nMyadmins have restricted me from working here! If you want to know more about it, contact support [@CentralLinks_Contactbot] for paid work.</b>',
                 reply_markup=reply_markup,
             )
 
@@ -38,11 +40,11 @@ async def save_group(bot, message):
             await bot.leave_chat(message.chat.id)
             return
         buttons = [[
-                    InlineKeyboardButton('ℹ️ Help', url=f"https://telegram.dog/{temp.U_NAME}?start=help"),
-                    InlineKeyboardButton('📢 Updates', url='https://telegram.dog/central_links')
-                 ],[
-                    InlineKeyboardButton("Bot Owner", url="telegram.me/Thiyaku_Suriya")
-                  ]]
+            InlineKeyboardButton('ℹ️ Help', url=f"https://telegram.dog/{temp.U_NAME}?start=help"),
+            InlineKeyboardButton('📢 Updates', url='https://telegram.dog/central_links')
+        ],[
+            InlineKeyboardButton("Bot Owner", url="telegram.me/Thiyaku_Suriya")
+        ]]
         reply_markup=InlineKeyboardMarkup(buttons)
         await message.reply_text(
             text=f"<b>Thankyou For Adding Me In {message.chat.title} ❣️\n\nIf you have any questions & doubts about using me contact support.</b>",
@@ -57,11 +59,11 @@ async def save_group(bot, message):
                     except:
                         pass
                 temp.MELCOW['welcome'] = await message.reply_video(
-                                                 video=(MELCOW_VID),
-                                                 caption=(script.MELCOW_ENG.format(u.mention, message.chat.title)),
+                video="https://telegra.ph/file/03691465baa774e46506d.mp4",                                               
+                                                 caption=f'<b>Hey, {u.mention} 👋🏻\nWelcome to our group {message.chat.title}\n\nYou can find Movies / Series / Anime from here. Enjoyyy😉.\n\n<b>┏≫ Follow Group Rules</b>\n┣ <b>Main Channel›› @Central_links</b></code>\n<b>┗≫ Follow Group Rules</b>',
                                                  reply_markup=InlineKeyboardMarkup(
                                                                          [[
-                                                                           InlineKeyboardButton("﹄ Join Updates Channel ﹃", url='https://telegram.me/central_links')
+                                                                           InlineKeyboardButton("﹄ Join Updates Channel ﹃", url=CHNL_LNK)
                                                                         ],[
                                                                            InlineKeyboardButton("✇ How to Search Movies from our Group ? ✇", url="https://telegram.dog/central_tutorial/21")
                                                                          ]]
@@ -70,7 +72,7 @@ async def save_group(bot, message):
                 )
                 
         if settings["auto_delete"]:
-            await asyncio.sleep(600)
+            await asyncio.sleep(60)
             await (temp.MELCOW['welcome']).delete()
 
 @Client.on_message(filters.command('leave') & filters.user(ADMINS))
@@ -128,7 +130,7 @@ async def disable_chat(bot, message):
         reply_markup=InlineKeyboardMarkup(buttons)
         await bot.send_message(
             chat_id=chat_, 
-            text=f'<b>Hello Friends, \nMy admin has told me to leave from group so i go! If you wanna add me again contact my support group.</b> \nReason : <code>{reason}</code>',
+            text=f'<b>Hello Friends, \nMy admin has told me to leave from group so i go! If you wanna add me again contact my support bot [@CentralLinks_Contactbot] for paid work.</b> \nReason : <code>{reason}</code>',
             reply_markup=reply_markup)
         await bot.leave_chat(chat_)
     except Exception as e:
@@ -158,12 +160,43 @@ async def get_ststs(bot, message):
     total_users = await db.total_users_count()
     totl_chats = await db.total_chat_count()
     files = await Media.count_documents()
-    size = await db.get_db_size()
-    free = 536870912 - size
-    size = get_size(size)
-    free = get_size(free)
-    await rju.edit(script.STATUS_TXT.format(files, total_users, totl_chats, size, free))
+    stats = await clientDB.command('dbStats')
+    used_dbSize = (stats['dataSize']/(1024*1024))+(stats['indexSize']/(1024*1024))
+    free_dbSize = 512-used_dbSize
+    await rju.edit(script.STATUS_TXT.format(files, total_users, totl_chats, round(used_dbSize, 2), round(free_dbSize, 2)))
 
+'''@Client.on_callback_query()
+async def cb_handler(client: Client, query: CallbackQuery):
+    if query.data == "close_data":
+        await query.message.delete()
+    elif query.data == "refrsh":
+        await query.answer("Fetching MongoDb DataBase")
+        buttons = [[
+            InlineKeyboardButton('Cʟᴏsᴇ ✘', callback_data='close_data'),
+            InlineKeyboardButton('⟲ Rᴇғʀᴇsʜ', callback_data='refrsh')
+        ]]
+        await client.edit_message_media(
+            query.message.chat.id, 
+            query.message.id, 
+            InputMediaPhoto(random.choice(PICS))
+        )
+        reply_markup = InlineKeyboardMarkup(buttons)
+        total = await Media.count_documents()
+        users = await db.total_users_count()
+        chats = await db.total_chat_count()
+        monsize = await db.get_db_size()
+        free = 536870912 - monsize
+        monsize = get_size(monsize)
+        free = get_size(free)
+        cpu_usage = psutil.cpu_percent()
+        ram_usage = psutil.virtual_memory().percent
+        disk_usage = psutil.disk_usage('/').percent
+        currentTime = time.strftime("%Hh%Mm%Ss", time.gmtime(time.time() - BOT_START_TIME))
+        await query.message.edit_text(
+            text=script.STATUS_TXT.format(total, users, chats, monsize, free, cpu_usage, ram_usage, disk_usage, currentTime),
+            reply_markup=reply_markup,
+            parse_mode=enums.ParseMode.HTML
+        )'''
 @Client.on_message(filters.command('invite') & filters.user(ADMINS))
 async def gen_invite(bot, message):
     if len(message.command) == 1:
@@ -179,7 +212,7 @@ async def gen_invite(bot, message):
         return await message.reply("Invite Link Generation Failed, Iam Not Having Sufficient Rights")
     except Exception as e:
         return await message.reply(f'Error {e}')
-    await message.reply(f'Here is your Invite Link {link.invite_link}')
+    await message.reply(f'Here is your Invite Link ›› {link.invite_link}')
 
 @Client.on_message(filters.command('ban') & filters.user(ADMINS))
 async def ban_a_user(bot, message):
@@ -232,7 +265,7 @@ async def unban_a_user(bot, message):
     except PeerIdInvalid:
         return await message.reply("This is an invalid user, make sure ia have met him before.")
     except IndexError:
-        return await message.reply("Thismight be a channel, make sure its a user.")
+        return await message.reply("This might be a channel, make sure its a user.")
     except Exception as e:
         return await message.reply(f'Error - {e}')
     else:
