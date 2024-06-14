@@ -1,7 +1,3 @@
-# Don't Remove Credit @VJ_Botz
-# Subscribe YouTube Channel For Amazing Bot @Tech_VJ
-# Ask Doubt on telegram @KingVJ01
-
 import logging, asyncio, os, re, random, pytz, aiohttp, requests, string, json, http.client
 from info import *
 from imdb import Cinemagoer 
@@ -19,8 +15,10 @@ from shortzy import Shortzy
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-join_db = JoinReqs
-BTN_URL_REGEX = re.compile(r"(\[([^\[]+?)\]\((buttonurl|buttonalert):(?:/{0,2})(.+?)(:same)?\))")
+#join_db = JoinReqs
+BTN_URL_REGEX = re.compile(
+    r"(\[([^\[]+?)\]\((buttonurl|buttonalert):(?:/{0,2})(.+?)(:same)?\))"
+)
 
 imdb = Cinemagoer() 
 TOKENS = {}
@@ -181,7 +179,7 @@ async def broadcast_messages(user_id, message):
         return await broadcast_messages(user_id, message)
     except InputUserDeactivated:
         await db.delete_user(int(user_id))
-        logging.info(f"{user_id}-Removed from Database, since deleted account.")
+        logging.info(f"{user_id}-Removed from Database, because deleted account.")
         return False, "Deleted"
     except UserIsBlocked:
         logging.info(f"{user_id} -Blocked the bot.")
@@ -522,24 +520,48 @@ async def get_tutorial(chat_id):
 async def get_verify_shorted_link(link, url, api):
     API = api
     URL = url
-    if URL == "api.shareus.io":
-        url = f'https://{URL}/easy_api'
-        params = {
-            "key": API,
-            "link": link,
-        }
+    https = link.split(":")[0]
+    if "http" == https:
+        https = "https"
+        link = link.replace("http", https)
+
+    if URL == "api.shareus.in":
+        url = f"https://{URL}/shortLink"
+        params = {"token": API,
+                  "format": "json",
+                  "link": link,
+                  }
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, params=params, raise_for_status=True, ssl=False) as response:
-                    data = await response.text()
-                    return data
+                    data = await response.json(content_type="text/html")
+                    if data["status"] == "success":
+                        return data["shortlink"]
+                    else:
+                        logger.error(f"Error: {data['message']}")
+                        return f'https://{URL}/shortLink?token={API}&format=json&link={link}'
+
         except Exception as e:
             logger.error(e)
-            return link
+            return f'https://{URL}/shortLink?token={API}&format=json&link={link}'
     else:
-        shortzy = Shortzy(api_key=API, base_site=URL)
-        link = await shortzy.convert(link)
-        return link
+        url = f'https://{URL}/api'
+        params = {'api': API,
+                  'url': link,
+                  }
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, params=params, raise_for_status=True, ssl=False) as response:
+                    data = await response.json()
+                    if data["status"] == "success":
+                        return data['shortenedUrl']
+                    else:
+                        logger.error(f"Error: {data['message']}")
+                        return f'https://{URL}/api?api={API}&link={link}'
+
+        except Exception as e:
+            logger.error(e)
+            return f'{URL}/api?api={API}&link={link}'
         
 async def check_token(bot, userid, token):
     user = await bot.get_users(userid)
@@ -659,7 +681,7 @@ async def get_cap(settings, remaining_seconds, files, query, total_results, sear
             cap = IMDB_CAP
             cap+="<b>\n\n<u>🍿 Your Movie Files 👇</u>\n\nKindly join our channel, @Central_Links, to get movie files.</b>\n\n"
             for file in files:
-                cap += f"<b>📁 <a href='https://telegram.me/{temp.U_NAME}?start=files_{file.file_id}'>[{get_size(file.file_size)}] {' '.join(filter(lambda x: not x.startswith('[') and not x.startswith('@') and not x.startswith('www.'), file.file_name.split()))}\n\n</a></b>"
+                cap += f"<b> <a href='https://telegram.me/{temp.U_NAME}?start=files_{file.file.id}'>[{get_size(file.file_size)}] {' '.join(file.file_name.split())}\n\n@Central_Links\n\n</a></b>"
         else:
             imdb = await get_poster(search, file=(files[0]).file_name) if settings["imdb"] else None
             if imdb:
@@ -697,17 +719,17 @@ async def get_cap(settings, remaining_seconds, files, query, total_results, sear
                 )
                 cap+="<b>\n\n<u>🍿 Your Movie Files 👇</u>\n\nKindly join our channel, @Central_Links, to get movie files.</b>\n\n"
                 for file in files:
-                    cap += f"<b>📁 <a href='https://telegram.me/{temp.U_NAME}?start=files_{file.file_id}'>[{get_size(file.file_size)}] {' '.join(filter(lambda x: not x.startswith('[') and not x.startswith('@') and not x.startswith('www.'), file.file_name.split()))}\n\n</a></b>"
+                    cap += f"<b> <a href='https://telegram.me/{temp.U_NAME}?start=files_{file.file.id}'>[{get_size(file.file_size)}] {' '.join(file.file_name.split())}\n\n@Central_Links\n\n</a></b>"
             else:
                 cap = f"<b><b>The results for the  ☞ {search}\n\nRequested by ☞ {query.from_user.mention}\n\nResult Fetched in ☞ {remaining_seconds} seconds.\n\nPowered by ☞ : {query.message.chat.title} | @Central_Links\n\n⚠️ After 5 minutes, this message will be automatically deleted due to copyright infringement. 🗑️</b>"
                 cap+="<b><u>🍿 Your Movie Files 👇</u>\n\nKindly join our channel, @Central_Links, to get movie files.</b>\n\n"
                 for file in files:
-                    cap += f"<b>📁 <a href='https://telegram.me/{temp.U_NAME}?start=files_{file.file_id}'>[{get_size(file.file_size)}] {' '.join(filter(lambda x: not x.startswith('[') and not x.startswith('@') and not x.startswith('www.'), file.file_name.split()))}\n\n</a></b>"
+                    cap += f"<b> <a href='https://telegram.me/{temp.U_NAME}?start=files_{file.file.id}'>[{get_size(file.file_size)}] {' '.join(file.file_name.split())}\n\n@Central_Links\n\n</a></b>"
     else:
         cap = f"<b>The results for the  ☞ {search}\n\nRequested by ☞ {query.from_user.mention}\n\nResult Fetched in ☞ {remaining_seconds} seconds.\n\nPowered by ☞ : {query.message.chat.title} | @Central_Links\n\n⚠️ After 5 minutes, this message will be automatically deleted due to copyright infringement. 🗑️</b>"
         cap+="<b><u>🍿 Your Movie Files 👇</u>\n\nKindly join our channel, @Central_Links, to get movie files.</b>\n\n"
         for file in files:
-            cap += f"<b>📁 <a href='https://telegram.me/{temp.U_NAME}?start=files_{file.file_id}'>[{get_size(file.file_size)}] {' '.join(filter(lambda x: not x.startswith('[') and not x.startswith('@') and not x.startswith('www.'), file.file_name.split()))}\n\n</a></b>"
+            cap += f"<b> <a href='https://telegram.me/{temp.U_NAME}?start=files_{file.file.id}'>[{get_size(file.file_size)}] {' '.join(file.file_name.split())}\n\n@Central_Links\n\n</a></b>"
     return cap
 
 
@@ -738,3 +760,26 @@ async def get_seconds(time_string):
         return value * 86400 * 365
     else:
         return 0
+
+def get_media_from_message(message: "Message"):
+    media_types = (
+        "audio",
+        "document",
+        "photo",
+        "sticker",
+        "animation",
+        "video",
+        "voice",
+        "video_note",
+    )
+    for attr in media_types:
+        if media := getattr(message, attr, None):
+            return media
+        
+def get_name(media_msg: Message) -> str:
+    media = get_media_from_message(media_msg)
+    return getattr(media, "file_name", "None")
+
+def get_hash(media_msg: Message) -> str:
+    media = get_media_from_message(media_msg)
+    return getattr(media, "file_unique_id", "")[:6]
