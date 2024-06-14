@@ -8,7 +8,7 @@ import asyncio
 from pathlib import Path
 from datetime import date, datetime
 from aiohttp import web
-from pyrogram import Client, __version__
+from pyrogram import Client,idle, __version__ 
 from pyrogram.raw.all import layer
 from database.ia_filterdb import Media
 from database.users_chats_db import db
@@ -100,6 +100,7 @@ async def start():
     await runner.setup()
     bind_address = '0.0.0.0'
     await web.TCPSite(runner, bind_address, PORT).start()
+    await idle()
 
 async def stop():
     await TechVJBot.stop()
@@ -107,6 +108,6 @@ async def stop():
 
 if __name__ == '__main__':
     try:
-        asyncio.run(start())
+        loop.run_until_complete.run(start())
     except KeyboardInterrupt:
-        asyncio.run(stop())
+        logging.info('Service Stopped Bye 👋')
